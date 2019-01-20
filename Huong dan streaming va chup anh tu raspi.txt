@@ -1,0 +1,59 @@
+HUOng DAN QUAY PHIM VA CHUP ANH TREN RASPI
+
+CAI CAC THU VIEN SAU TREN PUTTY
+Link huong dan
+https://github.com/cncjs/cncjs/wiki/Setup-Guide:-Raspberry-Pi-%7C-MJPEG-Streamer-Install-&-Setup-&-FFMpeg-Recording
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+# Update & Install Tools
+sudo apt-get update
+sudo apt-get upgrade -y
+sudo apt-get install build-essential libjpeg8-dev imagemagick libv4l-dev cmake -y
+
+# Clone Repo in /tmp
+cd /tmp
+git clone https://github.com/jacksonliam/mjpg-streamer.git
+cd mjpg-streamer/mjpg-streamer-experimental
+
+# Make
+make
+sudo make install
+
+# Run
+/usr/local/bin/mjpg_streamer -i "input_uvc.so -r 1280x720 -d /dev/video0 -f 30 -q 80" -o "output_http.so -p 8080 -w /usr/local/share/mjpg-streamer/www"
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+Chu thich
+-d <device name - chuỗi - mặc định /dev/video0>
+
+-quality <chất lượng - số nguyên từ 1 - 100 - mặc định 75>
+
+-f <frame per second - số nguyên từ 1 - 60 - mặc định 10>
+
+-r <kích thước khung hình - chuỗi (xem hướng dẫn ở dưới)>
+
+-p <port - số nguyên - từ 1 => 216 - 1>
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+Để biết được các kích thức khung bình của camera, bạn chạy lệnh sau:
+
+v4l2-ctl --list-formats-ext --device /dev/video0
+
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+Để kiểm tra camera có MJPEG hay không, bạn theo hướng dẫn sau:
+
+v4l2-ctl --list-formats --device /dev/video0 | grep MJPEG
+
+Chú thích
+
+--device <device name - chuỗi - mặc định là /dev/video0
+
+Nếu kết quả hiện ra là thì camera của bạn đã hỗ trợ mjpeg heart
+
+Name        : MJPEG
+
+
+Trong trường hợp bạn không có camera có hỗ trợ MJPEG thì cũng không sao, chỉ việc thêm tham số -y vào trong tham số input như sau.
+
+LD_LIBRARY_PATH=/usr/local/lib mjpg_streamer -i "/usr/local/lib/input_uvc.so -d /dev/video0 -quality 100 -f 30 -r 640x480 -y" -o "/usr/local/lib/output_http.so -w /usr/local/www -p 8080
